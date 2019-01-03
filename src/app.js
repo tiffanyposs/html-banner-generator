@@ -2,34 +2,85 @@ import fs from 'fs';
 import fse from 'fs-extra';
 import cheerio from 'cheerio';
 import sizeOf from 'image-size';
+import pretty from 'pretty';
 
+/**
+ * Example banner path that all banners will be based off of
+ * @name SAMPLE_BANNER_PATH
+*/
+const SAMPLE_BANNER_PATH = 'src/project/sample-banner';
+
+/**
+ * Examle banner images path
+ * @name SAMPLE_BANNER_PATH_IMAGES
+ * @type {String}
+*/
+const SAMPLE_BANNER_PATH_IMAGES = `${SAMPLE_BANNER_PATH}/images`;
+
+/**
+ * Path of example banner with clicktag
+ * @name NEW_SAMPLE_BANNER_PATH
+ * @type {String}
+*/
+const NEW_SAMPLE_BANNER_PATH = 'src/project/sample-banner-clicktag';
+
+/**
+ * Path of images to use for new banners
+ * @name NEW_SAMPLE_BANNER_PATH
+ * @type {String}
+*/
+const IMAGE_PATH = 'src/project/images';
+
+/**
+ * Path of new banners created
+ * @name NEW_SAMPLE_BANNER_PATH
+ * @type {String}
+*/
+const PROCESSED_BANNERS = 'src/project/processed-banners';
+
+/**
+ * Meta tag and script tag html to add for clicktag
+ * @name clicktagPartOne
+ * @type {Function}
+ * @param width width of example banner
+ * @param height height of example banner
+ * @return {Array}
+*/
 const clicktagPartOne = (width, height) => {
-	const meta = `<meta name="ad.size" content="width=${width},height=${height}">`;
-	const script = `<script type="text/javascript">var clickTag = ""</script>`;
+	const meta = `\n<meta name="ad.size" content="width=${width},height=${height}">\n`;
+	const script = `<script type="text/javascript">var clickTag = ""</script>\n`;
 	return [meta, script];
 }
 
+/**
+ * Anchor tag html to add for clicktag
+ * @name clicktagPartTwo
+ * @type {Function}
+ * @return {String}
+*/
 const clicktagPartTwo = () => {
 	return `<a href="javascript:window.open(window.clickTag)"></a>`;
 }
 
-// adds clicktag to html in sample banner
-const createSampleWithClicktag = () => {
-	const sampleBannerFolder = 'src/project/sample-banner';
-	const newSampleBannerFolder = 'src/project/sample-banner-clicktag';
 
-	if (!fs.existsSync(newSampleBannerFolder)) {
-		fs.mkdirSync(newSampleBannerFolder);
+/**
+ * Adds clicktag html in sample-banner-clicktag folder's .html file
+ * @name createSampleWithClicktag
+ * @type {Function}
+*/
+const createSampleWithClicktag = () => {
+	if (!fs.existsSync(NEW_SAMPLE_BANNER_PATH)) {
+		fs.mkdirSync(NEW_SAMPLE_BANNER_PATH);
 	} else {
-		fse.emptyDirSync(newSampleBannerFolder);
+		fse.emptyDirSync(NEW_SAMPLE_BANNER_PATH);
 	}
 
-	fse.copySync(sampleBannerFolder, newSampleBannerFolder);
+	fse.copySync(SAMPLE_BANNER_PATH, NEW_SAMPLE_BANNER_PATH);
 
 	// read the contents of the sample-banner folder
-	const contents = fs.readdirSync(sampleBannerFolder);
+	const contents = fs.readdirSync(SAMPLE_BANNER_PATH);
 	const htmlFileName = contents.filter(name => name.indexOf('.html') > -1)[0];
-	const htmlFileContents = fs.readFileSync(`${sampleBannerFolder}/${htmlFileName}`);
+	const htmlFileContents = fs.readFileSync(`${SAMPLE_BANNER_PATH}/${htmlFileName}`);
 
 	// read the size of the canvas
 	const $ = cheerio.load(htmlFileContents);
@@ -43,95 +94,98 @@ const createSampleWithClicktag = () => {
 	$('title').after(clicktagOne[0]);
 	$('canvas').wrap(clicktagTwo);
 
-	fs.writeFileSync(`${newSampleBannerFolder}/${htmlFileName}`, $.html());
-
+	fs.writeFileSync(`${NEW_SAMPLE_BANNER_PATH}/${htmlFileName}`, pretty($.html()));
 }
 
-
-// matches sizes of the sample banner images to the size of the banner images
-// returns the matching sizes
+/**
+ * Takes the size of the source images, and finds the matching sizes in the example banner
+ * @name getFilesToReplace
+ * @type {Function}
+ * @return {Array} - names of the files that need to be replaced
+*/
 const getFilesToReplace = () => {
-	const extraImageFolder = 'src/project/images';
-	const extraImageSubFolders = fs.readdirSync(extraImageFolder);
-	const sampleImageNames = fs.readdirSync(`${extraImageFolder}/${extraImageSubFolders[0]}`);
-	const sampleImageDimentions = sizeOf(`${extraImageFolder}/${extraImageSubFolders[0]}/${sampleImageNames[0]}`);
+	const extraImageSubFolders = fs.readdirSync(IMAGE_PATH);
+	const sampleImageNames = fs.readdirSync(`${IMAGE_PATH}/${extraImageSubFolders[0]}`);
+	const sampleImageDimentions = sizeOf(`${IMAGE_PATH}/${extraImageSubFolders[0]}/${sampleImageNames[0]}`);
 
-	const bannerImageFolder = 'src/project/sample-banner/images';
-	const bannerImageNames = fs.readdirSync(bannerImageFolder);
+	const bannerImageNames = fs.readdirSync(SAMPLE_BANNER_PATH_IMAGES);
 	return bannerImageNames.filter(image => {
-		const size = sizeOf(`${bannerImageFolder}/${image}`);
+		const size = sizeOf(`${SAMPLE_BANNER_PATH_IMAGES}/${image}`);
 		return sampleImageDimentions.width === size.width && sampleImageDimentions.height === size.height;
 	});
 }
 
-// setup the processed folder banner
+/**
+ * Sets up the folder structure within processed-banners folder
+ * @name setupProcessedBannerFolder
+ * @type {Function}
+*/
 const setupProcessedBannerFolder = () => {
 
 	// create a new processed-banners folder or empty the existing one
-	const newFolderRoot = 'src/project/processed-banners';
-	if (!fs.existsSync(newFolderRoot)) {
-		fs.mkdirSync(newFolderRoot);
+	if (!fs.existsSync(PROCESSED_BANNERS)) {
+		fs.mkdirSync(PROCESSED_BANNERS);
 	} else {
-		fse.emptyDirSync(newFolderRoot);
+		fse.emptyDirSync(PROCESSED_BANNERS);
 	}
 
 	const filesToReplace = getFilesToReplace();
 
 	// make folders with same names as the images folder
-	const imageFolder = 'src/project/images';
-	const imageFolderNames = fs.readdirSync(imageFolder);
+	const imageFolderNames = fs.readdirSync(IMAGE_PATH);
 	for (let folderName of imageFolderNames) {
-		fs.mkdirSync(`${newFolderRoot}/${folderName}`);
-		const images = fs.readdirSync(`${imageFolder}/${folderName}`);
+		fs.mkdirSync(`${PROCESSED_BANNERS}/${folderName}`);
+		const images = fs.readdirSync(`${IMAGE_PATH}/${folderName}`);
 		const bannersToCreate = Math.ceil(images.length / filesToReplace.length); // calculates the number of banners based on number of assets
 		for (let i = 0; i < bannersToCreate; i++) {
-			const newBannerPath = `${newFolderRoot}/${folderName}/banner-${i+1}`;
+			const newBannerPath = `${PROCESSED_BANNERS}/${folderName}/banner-${i+1}`;
 			fs.mkdirSync(newBannerPath);
-			fse.copySync('src/project/sample-banner-clicktag', newBannerPath);
+			fse.copySync(NEW_SAMPLE_BANNER_PATH, newBannerPath);
 		}
 	}
 }
 
-// read contents of the src/sample-banner folder
-const init = () => {
-
-	// returns html with clicktag
-	createSampleWithClicktag();
-
-	// make a new folder for processed folder, remove any old content
-	setupProcessedBannerFolder();
-
+/**
+ * replaces all the images with new source images
+ * @name replaceImages
+ * @type {Function}
+*/
+const replaceImages = () => {
 	const filesToReplace = getFilesToReplace();
 
- 	const images = 'src/project/images';
-	const processedBanners = 'src/project/processed-banners';
-	const imageCategories = fs.readdirSync(images);
+	const imageCategories = fs.readdirSync(IMAGE_PATH);
 
 	for (let category of imageCategories) {
 		let bannerCounter = 0;
-		const imageNames = fs.readdirSync(`${images}/${category}`);
-		const bannerFolderName = `${processedBanners}/${category}`;
+		const imageNames = fs.readdirSync(`${IMAGE_PATH}/${category}`);
+		const bannerFolderName = `${PROCESSED_BANNERS}/${category}`;
 		const bannerFolders = fs.readdirSync(bannerFolderName);
-		// console.log(imageNames, bannerFolders);
-
-
 
 		for (let bannerFolder of bannerFolders) {
 			for (let fileToReplace of filesToReplace) {
 
-				if (!fs.existsSync(`${images}/${category}/${imageNames[bannerCounter]}`)) {
+				if (!fs.existsSync(`${IMAGE_PATH}/${category}/${imageNames[bannerCounter]}`)) {
 					bannerCounter = 0;
 				}
 
-				const newImageData = fs.readFileSync(`${images}/${category}/${imageNames[bannerCounter]}`)
+				const newImageData = fs.readFileSync(`${IMAGE_PATH}/${category}/${imageNames[bannerCounter]}`)
 				const imageToReplace = `${bannerFolderName}/${bannerFolder}/images/${fileToReplace}`;
 				bannerCounter++;
 				fs.writeFileSync(imageToReplace, newImageData)
-				console.log(imageToReplace, newImageData)
 			}
 		}
 	}
+}
 
+/**
+ * initializes processing of banners
+ * @name init
+ * @type {Function}
+*/
+const init = () => {
+	createSampleWithClicktag();
+	setupProcessedBannerFolder();
+	replaceImages();
 }
 
 
