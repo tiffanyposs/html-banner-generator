@@ -14,12 +14,22 @@ const clicktagPartTwo = () => {
 }
 
 // adds clicktag to html in sample banner
-const addClicktags = () => {
+const createSampleWithClicktag = () => {
+	const sampleBannerFolder = 'src/project/sample-banner';
+	const newSampleBannerFolder = 'src/project/sample-banner-clicktag';
+
+	if (!fs.existsSync(newSampleBannerFolder)) {
+		fs.mkdirSync(newSampleBannerFolder);
+	} else {
+		fse.emptyDirSync(newSampleBannerFolder);
+	}
+
+	fse.copySync(sampleBannerFolder, newSampleBannerFolder);
+
 	// read the contents of the sample-banner folder
-	const folderRoot = 'src/project/sample-banner';
-	const contents = fs.readdirSync(folderRoot);
+	const contents = fs.readdirSync(sampleBannerFolder);
 	const htmlFileName = contents.filter(name => name.indexOf('.html') > -1)[0];
-	const htmlFileContents = fs.readFileSync(`${folderRoot}/${htmlFileName}`);
+	const htmlFileContents = fs.readFileSync(`${sampleBannerFolder}/${htmlFileName}`);
 
 	// read the size of the canvas
 	const $ = cheerio.load(htmlFileContents);
@@ -33,7 +43,8 @@ const addClicktags = () => {
 	$('title').after(clicktagOne[0]);
 	$('canvas').wrap(clicktagTwo);
 
-	return $;
+	fs.writeFileSync(`${newSampleBannerFolder}/${htmlFileName}`, $.html());
+
 }
 
 
@@ -56,8 +67,6 @@ const getFilesToReplace = () => {
 // setup the processed folder banner
 const setupProcessedBannerFolder = () => {
 
-	const bannerRoutes = [];
-
 	// create a new processed-banners folder or empty the existing one
 	const newFolderRoot = 'src/project/processed-banners';
 	if (!fs.existsSync(newFolderRoot)) {
@@ -78,25 +87,50 @@ const setupProcessedBannerFolder = () => {
 		for (let i = 0; i < bannersToCreate; i++) {
 			const newBannerPath = `${newFolderRoot}/${folderName}/banner-${i+1}`;
 			fs.mkdirSync(newBannerPath);
-			fse.copySync('src/project/sample-banner', newBannerPath);
-			bannerRoutes.push(newBannerPath);
+			fse.copySync('src/project/sample-banner-clicktag', newBannerPath);
 		}
 	}
-
-	return bannerRoutes;
 }
 
 // read contents of the src/sample-banner folder
 const init = () => {
 
 	// returns html with clicktag
-	const htmlWithClicktag = addClicktags();
+	createSampleWithClicktag();
 
 	// make a new folder for processed folder, remove any old content
-	const bannerRoutes = setupProcessedBannerFolder();
+	setupProcessedBannerFolder();
+
+	const filesToReplace = getFilesToReplace();
+
+ 	const images = 'src/project/images';
+	const processedBanners = 'src/project/processed-banners';
+	const imageCategories = fs.readdirSync(images);
+
+	for (let category of imageCategories) {
+		let bannerCounter = 0;
+		const imageNames = fs.readdirSync(`${images}/${category}`);
+		const bannerFolderName = `${processedBanners}/${category}`;
+		const bannerFolders = fs.readdirSync(bannerFolderName);
+		// console.log(imageNames, bannerFolders);
 
 
 
+		for (let bannerFolder of bannerFolders) {
+			for (let fileToReplace of filesToReplace) {
+
+				if (!fs.existsSync(`${images}/${category}/${imageNames[bannerCounter]}`)) {
+					bannerCounter = 0;
+				}
+
+				const newImageData = fs.readFileSync(`${images}/${category}/${imageNames[bannerCounter]}`)
+				const imageToReplace = `${bannerFolderName}/${bannerFolder}/images/${fileToReplace}`;
+				bannerCounter++;
+				fs.writeFileSync(imageToReplace, newImageData)
+				console.log(imageToReplace, newImageData)
+			}
+		}
+	}
 
 }
 
