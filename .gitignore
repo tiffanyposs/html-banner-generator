@@ -1,4 +1,5 @@
 .DS_Store
+.eslintrc.js
 node_modules
 src/project/processed-banners
 src/project/sample-banner-clicktag
