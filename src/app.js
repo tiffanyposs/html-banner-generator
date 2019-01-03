@@ -3,6 +3,7 @@ import fse from 'fs-extra';
 import cheerio from 'cheerio';
 import sizeOf from 'image-size';
 import pretty from 'pretty';
+import _ from 'lodash';
 
 /**
  * Example banner path that all banners will be based off of
@@ -177,6 +178,54 @@ const replaceImages = () => {
 	}
 }
 
+const createMixedContentVersions = () => {
+	const filesToReplace = getFilesToReplace();
+	const allContentCategories = fs.readdirSync(IMAGE_PATH);
+	const allImages = [];
+
+	// collect all image paths by category
+	for (let category of allContentCategories) {
+		const images = fs.readdirSync(`${IMAGE_PATH}/${category}`);
+		const imagePaths = images.map(image => `${IMAGE_PATH}/${category}/${image}`);
+		allImages.push(imagePaths);
+	}
+
+	const imageCombos = [];
+	let currentCollectionIndex = 0;
+
+	// create all the image combos
+	while (_.flatten(allImages).length > filesToReplace.length) {
+		const imageCombo = [];
+		while (imageCombo.length < filesToReplace.length) {
+			imageCombo.push(allImages[currentCollectionIndex][0]);
+			allImages[currentCollectionIndex].shift();
+			if (!allImages[currentCollectionIndex].length){
+				allImages.splice(currentCollectionIndex, 1);
+			}
+			// break;
+			if (currentCollectionIndex >= allImages.length - 1) {
+				currentCollectionIndex = 0;
+			} else {
+				currentCollectionIndex++;
+			}
+		}
+		currentCollectionIndex = 0; // always start with the first one
+
+		imageCombos.push(imageCombo)
+	}
+
+	fs.mkdirSync(`${PROCESSED_BANNERS}/mixed`);
+
+	// TODO: Create banners
+
+	console.log(imageCombos)
+
+
+
+	// console.log(allImages);
+	// console.log(imageCombos);
+}
+
 /**
  * initializes processing of banners
  * @name init
@@ -186,6 +235,8 @@ const init = () => {
 	createSampleWithClicktag();
 	setupProcessedBannerFolder();
 	replaceImages();
+
+	createMixedContentVersions()
 }
 
 
