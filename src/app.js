@@ -173,28 +173,31 @@ const setupProcessedBannerFolder = () => {
  * @type {Function}
 */
 const replaceImages = () => {
-	const filesToReplace = getFilesToReplace();
 
-	const imageCategories = fs.readdirSync(IMAGE_PATH);
+	const allBanners = fs.readdirSync(NEW_SAMPLE_BANNER_PATH);
 
-	for (let category of imageCategories) {
-		let bannerCounter = 0;
-		const imageNames = fs.readdirSync(`${IMAGE_PATH}/${category}`);
-		const bannerFolderName = `${PROCESSED_BANNERS}/${category}`;
-		const bannerFolders = fs.readdirSync(bannerFolderName);
+	for (let banner of allBanners) {
+		const filesToReplace = getFilesToReplace(banner);
+		const imageCategories = fs.readdirSync(`${IMAGE_PATH}/${banner}`);
+		for (let category of imageCategories) {
+			let bannerCounter = 0;
+			const imageNames = fs.readdirSync(`${IMAGE_PATH}/${banner}/${category}`);
+			const bannerFolderName = `${PROCESSED_BANNERS}/${banner}/${category}`;
+			const bannerFolders = fs.readdirSync(bannerFolderName);
 
-		for (let bannerFolder of bannerFolders) {
-			for (let fileToReplace of filesToReplace) {
+				for (let bannerFolder of bannerFolders) {
+					for (let fileToReplace of filesToReplace) {
 
-				if (!fs.existsSync(`${IMAGE_PATH}/${category}/${imageNames[bannerCounter]}`)) {
-					bannerCounter = 0;
+						if (!fs.existsSync(`${IMAGE_PATH}/${banner}/${category}/${imageNames[bannerCounter]}`)) {
+							bannerCounter = 0;
+						}
+						const newImageData = fs.readFileSync(`${IMAGE_PATH}/${banner}/${category}/${imageNames[bannerCounter]}`);
+						const imageToReplace = `${bannerFolderName}/${bannerFolder}/images/${fileToReplace}`;
+						bannerCounter++;
+						fs.writeFileSync(imageToReplace, newImageData)
+
+					}
 				}
-
-				const newImageData = fs.readFileSync(`${IMAGE_PATH}/${category}/${imageNames[bannerCounter]}`)
-				const imageToReplace = `${bannerFolderName}/${bannerFolder}/images/${fileToReplace}`;
-				bannerCounter++;
-				fs.writeFileSync(imageToReplace, newImageData)
-			}
 		}
 	}
 }
@@ -263,9 +266,9 @@ const createMixedContentVersions = () => {
 const init = () => {
 	createSampleWithClicktag();
 	setupProcessedBannerFolder();
+	replaceImages();
 
 
-	// replaceImages();
 	// createMixedContentVersions()
 }
 
