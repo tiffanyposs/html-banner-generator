@@ -16,6 +16,7 @@
     "fs-extra": "^7.0.1",
     "image-size": "^0.6.3",
     "lodash": "^4.17.11",
-    "pretty": "^2.0.0"
+    "pretty": "^2.0.0",
+    "readdir-enhanced": "^2.2.4"
   }
 }
