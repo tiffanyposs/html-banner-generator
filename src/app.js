@@ -70,32 +70,42 @@ const clicktagPartTwo = () => {
  * @type {Function}
 */
 const createSampleWithClicktag = () => {
+	// check if the new folder exists, create it or empty it
 	if (!fs.existsSync(NEW_SAMPLE_BANNER_PATH)) {
 		fs.mkdirSync(NEW_SAMPLE_BANNER_PATH);
 	} else {
 		fse.emptyDirSync(NEW_SAMPLE_BANNER_PATH);
 	}
 
-	fse.copySync(SAMPLE_BANNER_PATH, NEW_SAMPLE_BANNER_PATH);
+	const allBanners = fs.readdirSync(SAMPLE_BANNER_PATH)
 
-	// read the contents of the sample-banner folder
-	const contents = fs.readdirSync(SAMPLE_BANNER_PATH);
-	const htmlFileName = contents.filter(name => name.indexOf('.html') > -1)[0];
-	const htmlFileContents = fs.readFileSync(`${SAMPLE_BANNER_PATH}/${htmlFileName}`);
+	for (let banner of allBanners) {
+		const bannerPath = `${SAMPLE_BANNER_PATH}/${banner}`;
+		const newBannerPath = `${NEW_SAMPLE_BANNER_PATH}/${banner}`;
+		fs.mkdirSync(newBannerPath);
+		fse.copySync(bannerPath, newBannerPath);
 
-	// read the size of the canvas
-	const $ = cheerio.load(htmlFileContents);
-	const width = $('canvas').attr('width');
-	const height = $('canvas').attr('height');
+		// read the contents of the sample-banner folder
+		const contents = fs.readdirSync(bannerPath);
+		const htmlFileName = contents.filter(name => name.indexOf('.html') > -1)[0];
+		const htmlFileContents = fs.readFileSync(`${bannerPath}/${htmlFileName}`);
 
-	// get the clicktag html and add it to the temp html file
-	const clicktagOne = clicktagPartOne(width, height);
-	const clicktagTwo = clicktagPartTwo();
-	$('title').after(clicktagOne[1]);
-	$('title').after(clicktagOne[0]);
-	$('canvas').wrap(clicktagTwo);
+		// read the size of the canvas
+		const $ = cheerio.load(htmlFileContents);
+		const width = $('canvas').attr('width');
+		const height = $('canvas').attr('height');
 
-	fs.writeFileSync(`${NEW_SAMPLE_BANNER_PATH}/${htmlFileName}`, pretty($.html()));
+		// get the clicktag html and add it to the temp html file
+		const clicktagOne = clicktagPartOne(width, height);
+		const clicktagTwo = clicktagPartTwo();
+		$('title').after(clicktagOne[1]);
+		$('title').after(clicktagOne[0]);
+		$('canvas').wrap(clicktagTwo);
+
+		fs.writeFileSync(`${newBannerPath}/${htmlFileName}`, pretty($.html()));
+	}
+
+
 }
 
 /**
@@ -241,10 +251,12 @@ const createMixedContentVersions = () => {
 */
 const init = () => {
 	createSampleWithClicktag();
-	setupProcessedBannerFolder();
-	replaceImages();
 
-	createMixedContentVersions()
+
+
+	// setupProcessedBannerFolder();
+	// replaceImages();
+	// createMixedContentVersions()
 }
 
 
