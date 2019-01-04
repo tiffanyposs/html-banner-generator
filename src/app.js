@@ -12,13 +12,6 @@ import _ from 'lodash';
 const SAMPLE_BANNER_PATH = 'src/project/sample-banner';
 
 /**
- * Examle banner images path
- * @name SAMPLE_BANNER_PATH_IMAGES
- * @type {String}
-*/
-const SAMPLE_BANNER_PATH_IMAGES = `${SAMPLE_BANNER_PATH}/images`;
-
-/**
  * Path of example banner with clicktag
  * @name NEW_SAMPLE_BANNER_PATH
  * @type {String}
@@ -48,8 +41,8 @@ const PROCESSED_BANNERS = 'src/project/processed-banners';
  * @return {Array}
 */
 const clicktagPartOne = (width, height) => {
-	const meta = `\n<meta name="ad.size" content="width=${width},height=${height}">\n`;
-	const script = `<script type="text/javascript">var clickTag = ""</script>\n`;
+	const meta = `<meta name="ad.size" content="width=${width},height=${height}">`;
+	const script = `<script type="text/javascript">var clickTag = ""</script>`;
 	return [meta, script];
 }
 
@@ -195,7 +188,6 @@ const replaceImages = () => {
 						const imageToReplace = `${bannerFolderName}/${bannerFolder}/images/${fileToReplace}`;
 						bannerCounter++;
 						fs.writeFileSync(imageToReplace, newImageData)
-
 					}
 				}
 		}
@@ -208,52 +200,56 @@ const replaceImages = () => {
  * @type {Function}
 */
 const createMixedContentVersions = () => {
-	const filesToReplace = getFilesToReplace();
-	const allContentCategories = fs.readdirSync(IMAGE_PATH);
-	const allImages = [];
 
-	// collect all image paths by category
-	for (let category of allContentCategories) {
-		const images = fs.readdirSync(`${IMAGE_PATH}/${category}`);
-		const imagePaths = images.map(image => `${IMAGE_PATH}/${category}/${image}`);
-		allImages.push(imagePaths);
-	}
+	const allBanners = fs.readdirSync(NEW_SAMPLE_BANNER_PATH);
 
-	const imageCombos = [];
-	let currentCollectionIndex = 0;
+	for (let banner of allBanners) {
+		const filesToReplace = getFilesToReplace(banner);
+		const allContentCategories = fs.readdirSync(`${IMAGE_PATH}/${banner}`);
+		const allImages = [];
 
-	// create all the image combos
-	while (_.flatten(allImages).length > filesToReplace.length) {
-		const imageCombo = [];
-		while (imageCombo.length < filesToReplace.length) {
-			imageCombo.push(allImages[currentCollectionIndex][0]);
-			allImages[currentCollectionIndex].shift();
-			if (!allImages[currentCollectionIndex].length){
-				allImages.splice(currentCollectionIndex, 1);
-			}
-			if (currentCollectionIndex >= allImages.length - 1) {
-				currentCollectionIndex = 0;
-			} else {
-				currentCollectionIndex++;
-			}
+		// // collect all image paths by category
+		for (let category of allContentCategories) {
+			const images = fs.readdirSync(`${IMAGE_PATH}/${banner}/${category}`);
+			const imagePaths = images.map(image => `${IMAGE_PATH}/${banner}/${category}/${image}`);
+			allImages.push(imagePaths);
 		}
-		currentCollectionIndex = 0; // always start with the first one
 
-		imageCombos.push(imageCombo)
-	}
+		const imageCombos = [];
+		let currentCollectionIndex = 0;
 
-	// create main folder
-	fs.mkdirSync(`${PROCESSED_BANNERS}/mixed`);
+		while (_.flatten(allImages).length > filesToReplace.length) {
+			const imageCombo = [];
+			while (imageCombo.length < filesToReplace.length) {
+				imageCombo.push(allImages[currentCollectionIndex][0]);
+				allImages[currentCollectionIndex].shift();
+				if (!allImages[currentCollectionIndex].length){
+					allImages.splice(currentCollectionIndex, 1);
+				}
+				if (currentCollectionIndex >= allImages.length - 1) {
+					currentCollectionIndex = 0;
+				} else {
+					currentCollectionIndex++;
+				}
+			}
+			currentCollectionIndex = 0; // always start with the first one
 
-	// loop through all of the combos
-	for (let i = 0; i < imageCombos.length; i++) {
-		const destFolder = `${PROCESSED_BANNERS}/mixed/banner-${i+1}`;
-		fs.mkdirSync(destFolder);
-		fse.copySync(SAMPLE_BANNER_PATH, destFolder);
+			imageCombos.push(imageCombo)
+		}
 
-		// loop through all of the files to replace
-		for (let j = 0; j < filesToReplace.length; j++) {
-			fs.writeFileSync(`${destFolder}/images/${filesToReplace[j]}`, fs.readFileSync(imageCombos[i][j]))
+		// create main folder
+		const mixedBannerFolder = `${PROCESSED_BANNERS}/${banner}/mixed`;
+		fs.mkdirSync(mixedBannerFolder);
+
+		for (let i = 0; i < imageCombos.length; i++) {
+			const destFolder = `${mixedBannerFolder}/banner-${i+1}`;
+			fs.mkdirSync(destFolder);
+			fse.copySync(`${NEW_SAMPLE_BANNER_PATH}/${banner}`, destFolder)
+
+			// loop through all of the files to replace
+			for (let j = 0; j < filesToReplace.length; j++) {
+				fs.writeFileSync(`${destFolder}/images/${filesToReplace[j]}`, fs.readFileSync(imageCombos[i][j]))
+			}
 		}
 	}
 }
@@ -267,9 +263,7 @@ const init = () => {
 	createSampleWithClicktag();
 	setupProcessedBannerFolder();
 	replaceImages();
-
-
-	// createMixedContentVersions()
+	createMixedContentVersions();
 }
 
 
