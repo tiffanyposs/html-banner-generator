@@ -112,16 +112,20 @@ const createSampleWithClicktag = () => {
  * Takes the size of the source images, and finds the matching sizes in the example banner
  * @name getFilesToReplace
  * @type {Function}
+ * @param banner
  * @return {Array} - names of the files that need to be replaced
 */
-const getFilesToReplace = () => {
-	const extraImageSubFolders = fs.readdirSync(IMAGE_PATH);
-	const sampleImageNames = fs.readdirSync(`${IMAGE_PATH}/${extraImageSubFolders[0]}`);
-	const sampleImageDimentions = sizeOf(`${IMAGE_PATH}/${extraImageSubFolders[0]}/${sampleImageNames[0]}`);
+const getFilesToReplace = banner => {
+	const bannerPath = `${IMAGE_PATH}/${banner}`;
+	const sampleBannerPathImages = `${SAMPLE_BANNER_PATH}/${banner}/images`;
+	const extraImageSubFolders = fs.readdirSync(bannerPath);
+	const sampleImageNames = fs.readdirSync(`${bannerPath}/${extraImageSubFolders[0]}`);
+	const sampleImageDimentions = sizeOf(`${bannerPath}/${extraImageSubFolders[0]}/${sampleImageNames[0]}`);
 
-	const bannerImageNames = fs.readdirSync(SAMPLE_BANNER_PATH_IMAGES);
+
+	const bannerImageNames = fs.readdirSync(sampleBannerPathImages);
 	return bannerImageNames.filter(image => {
-		const size = sizeOf(`${SAMPLE_BANNER_PATH_IMAGES}/${image}`);
+		const size = sizeOf(`${sampleBannerPathImages}/${image}`);
 		return sampleImageDimentions.width === size.width && sampleImageDimentions.height === size.height;
 	});
 }
@@ -140,20 +144,27 @@ const setupProcessedBannerFolder = () => {
 		fse.emptyDirSync(PROCESSED_BANNERS);
 	}
 
-	const filesToReplace = getFilesToReplace();
+	const allBanners = fs.readdirSync(NEW_SAMPLE_BANNER_PATH);
 
-	// make folders with same names as the images folder
-	const imageFolderNames = fs.readdirSync(IMAGE_PATH);
-	for (let folderName of imageFolderNames) {
-		fs.mkdirSync(`${PROCESSED_BANNERS}/${folderName}`);
-		const images = fs.readdirSync(`${IMAGE_PATH}/${folderName}`);
-		const bannersToCreate = Math.ceil(images.length / filesToReplace.length); // calculates the number of banners based on number of assets
-		for (let i = 0; i < bannersToCreate; i++) {
-			const newBannerPath = `${PROCESSED_BANNERS}/${folderName}/banner-${i+1}`;
-			fs.mkdirSync(newBannerPath);
-			fse.copySync(NEW_SAMPLE_BANNER_PATH, newBannerPath);
+	for (let banner of allBanners) {
+		const filesToReplace = getFilesToReplace(banner);
+
+		fs.mkdirSync(`${PROCESSED_BANNERS}/${banner}`);
+		const imageFolderNames = fs.readdirSync(`${IMAGE_PATH}/${banner}`);
+
+		for (let folderName of imageFolderNames) {
+			fs.mkdirSync(`${PROCESSED_BANNERS}/${banner}/${folderName}`);
+			const images = fs.readdirSync(`${IMAGE_PATH}/${banner}/${folderName}`);
+			const bannersToCreate = Math.ceil(images.length / filesToReplace.length); // calculates the number of banners based on number of assets
+			for (let i = 0; i < bannersToCreate; i++) {
+
+				const newBannerPath = `${PROCESSED_BANNERS}/${banner}/${folderName}/banner-${i+1}`;
+				fs.mkdirSync(newBannerPath);
+				fse.copySync(`${NEW_SAMPLE_BANNER_PATH}/${banner}`, newBannerPath);
+			}
 		}
 	}
+
 }
 
 /**
@@ -251,10 +262,9 @@ const createMixedContentVersions = () => {
 */
 const init = () => {
 	createSampleWithClicktag();
+	setupProcessedBannerFolder();
 
 
-
-	// setupProcessedBannerFolder();
 	// replaceImages();
 	// createMixedContentVersions()
 }
