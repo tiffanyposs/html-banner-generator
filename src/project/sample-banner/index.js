@@ -9,29 +9,49 @@ lib.ssMetadata = [];
 
 
 
-(lib.puppy1 = function() {
-	this.initialize(img.puppy1);
+(lib.dogandcatnegativespacelogodesignpetstorevector13712861 = function() {
+	this.initialize(img.dogandcatnegativespacelogodesignpetstorevector13712861);
+}).prototype = p = new cjs.Bitmap();
+p.nominalBounds = new cjs.Rectangle(0,0,50,51);
+
+
+(lib.image1 = function() {
+	this.initialize(img.image1);
 }).prototype = p = new cjs.Bitmap();
 p.nominalBounds = new cjs.Rectangle(0,0,300,250);
 
 
-(lib.puppy2 = function() {
-	this.initialize(img.puppy2);
+(lib.image2 = function() {
+	this.initialize(img.image2);
 }).prototype = p = new cjs.Bitmap();
 p.nominalBounds = new cjs.Rectangle(0,0,300,250);
 
 
-(lib.puppy3 = function() {
-	this.initialize(img.puppy3);
+(lib.image3 = function() {
+	this.initialize(img.image3);
 }).prototype = p = new cjs.Bitmap();
 p.nominalBounds = new cjs.Rectangle(0,0,300,250);
+
+
+(lib.Tween4 = function(mode,startPosition,loop) {
+	this.initialize(mode,startPosition,loop,{});
+
+	// Layer_1
+	this.instance = new lib.dogandcatnegativespacelogodesignpetstorevector13712861();
+	this.instance.parent = this;
+	this.instance.setTransform(-25,-25.5);
+
+	this.timeline.addTween(cjs.Tween.get(this.instance).wait(1));
+
+}).prototype = p = new cjs.MovieClip();
+p.nominalBounds = new cjs.Rectangle(-25,-25.5,50,51);
 
 
 (lib.Tween3 = function(mode,startPosition,loop) {
 	this.initialize(mode,startPosition,loop,{});
 
 	// Layer_1
-	this.instance = new lib.puppy1();
+	this.instance = new lib.image1();
 	this.instance.parent = this;
 	this.instance.setTransform(-150,-125);
 
@@ -45,7 +65,7 @@ p.nominalBounds = new cjs.Rectangle(-150,-125,300,250);
 	this.initialize(mode,startPosition,loop,{});
 
 	// Layer_1
-	this.instance = new lib.puppy2();
+	this.instance = new lib.image2();
 	this.instance.parent = this;
 	this.instance.setTransform(-150,-125);
 
@@ -59,7 +79,7 @@ p.nominalBounds = new cjs.Rectangle(-150,-125,300,250);
 	this.initialize(mode,startPosition,loop,{});
 
 	// Layer_1
-	this.instance = new lib.puppy3();
+	this.instance = new lib.image3();
 	this.instance.parent = this;
 	this.instance.setTransform(-150,-125);
 
@@ -70,33 +90,41 @@ p.nominalBounds = new cjs.Rectangle(-150,-125,300,250);
 
 
 // stage content:
-(lib.puppybanner = function(mode,startPosition,loop) {
+(lib.index = function(mode,startPosition,loop) {
 if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
 
-	// image3
-	this.instance = new lib.Tween1("synched",0);
+	// Layer_1
+	this.instance = new lib.Tween4("synched",0);
 	this.instance.parent = this;
-	this.instance.setTransform(150,125);
+	this.instance.setTransform(25,224.5);
 	this.instance.alpha = 0;
-	this.instance._off = true;
 
-	this.timeline.addTween(cjs.Tween.get(this.instance).wait(119).to({_off:false},0).to({alpha:1},24).to({startPosition:0},24).wait(1));
+	this.timeline.addTween(cjs.Tween.get(this.instance).to({alpha:1},23).to({startPosition:0},24).to({alpha:0},24).to({_off:true},1).wait(96));
 
-	// image2
-	this.instance_1 = new lib.Tween2("synched",0);
+	// image3
+	this.instance_1 = new lib.Tween1("synched",0);
 	this.instance_1.parent = this;
 	this.instance_1.setTransform(150,125);
 	this.instance_1.alpha = 0;
 	this.instance_1._off = true;
 
-	this.timeline.addTween(cjs.Tween.get(this.instance_1).wait(47).to({_off:false},0).to({alpha:1},24).to({startPosition:0},48).to({alpha:0},24).to({_off:true},1).wait(24));
+	this.timeline.addTween(cjs.Tween.get(this.instance_1).wait(119).to({_off:false},0).to({alpha:1},24).to({startPosition:0},24).wait(1));
 
-	// image1
-	this.instance_2 = new lib.Tween3("synched",0);
+	// image2
+	this.instance_2 = new lib.Tween2("synched",0);
 	this.instance_2.parent = this;
 	this.instance_2.setTransform(150,125);
+	this.instance_2.alpha = 0;
+	this.instance_2._off = true;
 
-	this.timeline.addTween(cjs.Tween.get(this.instance_2).to({startPosition:0},47).to({alpha:0},24).to({_off:true},1).wait(96));
+	this.timeline.addTween(cjs.Tween.get(this.instance_2).wait(47).to({_off:false},0).to({alpha:1},24).to({startPosition:0},48).to({alpha:0},24).to({_off:true},1).wait(24));
+
+	// image1
+	this.instance_3 = new lib.Tween3("synched",0);
+	this.instance_3.parent = this;
+	this.instance_3.setTransform(150,125);
+
+	this.timeline.addTween(cjs.Tween.get(this.instance_3).to({startPosition:0},47).to({alpha:0},24).to({_off:true},1).wait(96));
 
 }).prototype = p = new cjs.MovieClip();
 p.nominalBounds = new cjs.Rectangle(150,125,300,250);
@@ -109,9 +137,10 @@ lib.properties = {
 	color: "#FFFFFF",
 	opacity: 1.00,
 	manifest: [
-		{src:"images/puppy1.jpg", id:"puppy1"},
-		{src:"images/puppy2.jpg", id:"puppy2"},
-		{src:"images/puppy3.jpg", id:"puppy3"}
+		{src:"images/dogandcatnegativespacelogodesignpetstorevector13712861.jpg", id:"dogandcatnegativespacelogodesignpetstorevector13712861"},
+		{src:"images/image1.jpg", id:"image1"},
+		{src:"images/image2.jpg", id:"image2"},
+		{src:"images/image3.jpg", id:"image3"}
 	],
 	preloads: []
 };

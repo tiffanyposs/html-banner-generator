@@ -178,6 +178,11 @@ const replaceImages = () => {
 	}
 }
 
+/**
+ * creates mixed content versions
+ * @name createMixedContentVersions
+ * @type {Function}
+*/
 const createMixedContentVersions = () => {
 	const filesToReplace = getFilesToReplace();
 	const allContentCategories = fs.readdirSync(IMAGE_PATH);
@@ -213,25 +218,20 @@ const createMixedContentVersions = () => {
 		imageCombos.push(imageCombo)
 	}
 
+	// create main folder
 	fs.mkdirSync(`${PROCESSED_BANNERS}/mixed`);
-	// make one subfolder per image Combo
 
+	// loop through all of the combos
 	for (let i = 0; i < imageCombos.length; i++) {
 		const destFolder = `${PROCESSED_BANNERS}/mixed/banner-${i+1}`;
 		fs.mkdirSync(destFolder);
 		fse.copySync(SAMPLE_BANNER_PATH, destFolder);
 
+		// loop through all of the files to replace
 		for (let j = 0; j < filesToReplace.length; j++) {
 			fs.writeFileSync(`${destFolder}/images/${filesToReplace[j]}`, fs.readFileSync(imageCombos[i][j]))
 		}
 	}
-
-	// fse.copySync(SAMPLE_BANNER_PATH, NEW_SAMPLE_BANNER_PATH);
-
-	// TODO : Create banners
-
-	console.log(imageCombos)
-
 }
 
 /**
