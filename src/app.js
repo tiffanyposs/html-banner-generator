@@ -5,6 +5,10 @@ import sizeOf from 'image-size';
 import pretty from 'pretty';
 import _ from 'lodash';
 
+import readdir from 'readdir-enhanced';
+
+const PROJECT_ROOT = `src/project`
+
 /**
  * Example banner path that all banners will be based off of
  * @name SAMPLE_BANNER_PATH
@@ -255,11 +259,29 @@ const createMixedContentVersions = () => {
 }
 
 /**
+ * deletes hidden files such as .DS_Store
+ * @name cleanHiddenFiles
+ * @type {Function}
+*/
+const cleanHiddenFiles = () => {
+	const filesToClean = ['.DS_Store'];
+	let files = readdir.sync(PROJECT_ROOT, { deep: true });
+
+	for (let deleteFileName of filesToClean) {
+		let filteredFiles = files.filter(file => file.includes(deleteFileName))
+		for (let filteredFile of filteredFiles) {
+			fs.unlinkSync(`${PROJECT_ROOT}/${filteredFile}`);
+		}
+	}
+}
+
+/**
  * initializes processing of banners
  * @name init
  * @type {Function}
 */
 const init = () => {
+	cleanHiddenFiles();
 	createSampleWithClicktag();
 	setupProcessedBannerFolder();
 	replaceImages();
