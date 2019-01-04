@@ -202,7 +202,6 @@ const createMixedContentVersions = () => {
 			if (!allImages[currentCollectionIndex].length){
 				allImages.splice(currentCollectionIndex, 1);
 			}
-			// break;
 			if (currentCollectionIndex >= allImages.length - 1) {
 				currentCollectionIndex = 0;
 			} else {
@@ -215,15 +214,24 @@ const createMixedContentVersions = () => {
 	}
 
 	fs.mkdirSync(`${PROCESSED_BANNERS}/mixed`);
+	// make one subfolder per image Combo
 
-	// TODO: Create banners
+	for (let i = 0; i < imageCombos.length; i++) {
+		const destFolder = `${PROCESSED_BANNERS}/mixed/banner-${i+1}`;
+		fs.mkdirSync(destFolder);
+		fse.copySync(SAMPLE_BANNER_PATH, destFolder);
+
+		for (let j = 0; j < filesToReplace.length; j++) {
+			fs.writeFileSync(`${destFolder}/images/${filesToReplace[j]}`, fs.readFileSync(imageCombos[i][j]))
+		}
+	}
+
+	// fse.copySync(SAMPLE_BANNER_PATH, NEW_SAMPLE_BANNER_PATH);
+
+	// TODO : Create banners
 
 	console.log(imageCombos)
 
-
-
-	// console.log(allImages);
-	// console.log(imageCombos);
 }
 
 /**
