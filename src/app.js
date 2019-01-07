@@ -4,37 +4,36 @@ import cheerio from 'cheerio';
 import sizeOf from 'image-size';
 import pretty from 'pretty';
 import _ from 'lodash';
-
 import readdir from 'readdir-enhanced';
 
-const PROJECT_ROOT = `src/project`
+const PROJECT_ROOT = `src/project`;
 
 /**
  * Example banner path that all banners will be based off of
  * @name SAMPLE_BANNER_PATH
 */
-const SAMPLE_BANNER_PATH = 'src/project/sample-banner';
+const SAMPLE_BANNER_PATH = `${PROJECT_ROOT}/sample-banner`;
 
 /**
  * Path of example banner with clicktag
  * @name NEW_SAMPLE_BANNER_PATH
  * @type {String}
 */
-const NEW_SAMPLE_BANNER_PATH = 'src/project/sample-banner-clicktag';
+const NEW_SAMPLE_BANNER_PATH = `${PROJECT_ROOT}/sample-banner-clicktag`;
 
 /**
  * Path of images to use for new banners
  * @name NEW_SAMPLE_BANNER_PATH
  * @type {String}
 */
-const IMAGE_PATH = 'src/project/images';
+const IMAGE_PATH = `${PROJECT_ROOT}/images`;
 
 /**
  * Path of new banners created
  * @name NEW_SAMPLE_BANNER_PATH
  * @type {String}
 */
-const PROCESSED_BANNERS = 'src/project/processed-banners';
+const PROCESSED_BANNERS = `${PROJECT_ROOT}/processed-banners`;
 
 /**
  * Meta tag and script tag html to add for clicktag
