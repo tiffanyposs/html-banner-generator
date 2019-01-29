@@ -6,11 +6,18 @@ import pretty from 'pretty';
 import _ from 'lodash';
 import readdir from 'readdir-enhanced';
 
+
+/**
+	* Root Project
+	* @name PROJECT_ROOT
+	* @type {String}
+*/
 const PROJECT_ROOT = `src/project`;
 
 /**
  * Example banner path that all banners will be based off of
  * @name SAMPLE_BANNER_PATH
+ * @type {String}
 */
 const SAMPLE_BANNER_PATH = `${PROJECT_ROOT}/sample-banner`;
 
@@ -100,8 +107,6 @@ const createSampleWithClicktag = () => {
 
 		fs.writeFileSync(`${newBannerPath}/${htmlFileName}`, pretty($.html()));
 	}
-
-
 }
 
 /**
